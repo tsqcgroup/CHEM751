@@ -1,0 +1,23 @@
+ $contrl runtyp=optimize ispher=1 scftyp=rhf $end
+ $contrl coord=zmt $end
+ $scf dirscf=.t. fdiff=.f. $end
+ $basis gbasis=accd $end
+ $system mwords=100 $end
+ $data
+ 
+ c1
+ C
+ C 1 bCC
+ H 1 bCH 2 aHCC
+ H 1 bCH 2 aHCC 3  dH1CCH1
+ H 1 bCH 2 aHCC 3 -dH1CCH1
+ H 2 bCH 1 aHCC 3  dH2CCH1
+ H 2 bCH 1 aHCC 6  dH1CCH1
+ H 2 bCH 1 aHCC 6 -dH1CCH1
+
+ bCH=1.0941
+ bCC=1.5121
+ aHCC=110.568
+ dH1CCH1=120
+ dH2CCH1=60.0
+ $end

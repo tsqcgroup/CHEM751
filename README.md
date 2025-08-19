@@ -3,7 +3,7 @@
 
 you need to work on the interactive session by using the following command
  
- ```srun -A chem751 -p chem751 --mem=6g -t 60 --pty /bin/bash ```
+ ```srun -A chem751 -p chem751 -N 1 -c 2 --mem=5g -t 60 --pty /bin/bash ```
  
  - for the first time downloading the repo to your directory
 	1. load the following modules
@@ -12,7 +12,9 @@ you need to work on the interactive session by using the following command
 		module load compiler/GCC/12.2.0 devel/CMake/3.24.3-GCCcore-12.2.0 
 		module load mpi/OpenMPI/4.1.4-GCC-12.2.0 
 		module load lang/Python/3.10.8-GCCcore-12.2.0
-		module load tools/git tools/tcsh ```
+		module load tools/git tools/tcsh
+  		```
+  
 	2. clone the repo 
  
  		``` git clone git@github.com:tsatta/CHEM751.git ```

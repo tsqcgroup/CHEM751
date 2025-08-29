@@ -17,7 +17,7 @@ you need to work on the interactive session by using the following command
   
 	2. clone the repo 
  
- 		``` git clone git@github.com:tsatta/CHEM751.git ```
+ 		``` git clone git@github.com:tsqcgroup/CHEM751.git ```
 
  - If you already have the repo,
    
@@ -25,15 +25,12 @@ you need to work on the interactive session by using the following command
 		source env_gcc.sh
 		source git-completion.bash 
 
- - Some important git commands are in ```doc-git.txt```
+ - Some important git commands are in ```doc-git.md```
 
 ## To run the calculation
 
-You can copy the submission script from ```SCRIPT``` directory to your working directory.
- - if you use the interactive section, please use ```subgms_local.sh```
-   and run the calculation by the following command
-   
-   ```./subgms_local.sh file_name.inp```
+You can copy the submission script from ```script_submit``` directory to your working directory.
+
  - if you want to use the queuing system, please use ```subgms_mpi.sh```
    and run the calculation by the following command
    

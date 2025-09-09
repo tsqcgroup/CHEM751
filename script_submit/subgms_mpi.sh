@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -N 1
 #SBATCH -t 01:00:00
-#SBATCH --acount=chem751 --partition=chem751
+#SBATCH --account=chem751 --partition=chem751
 #SBATCH --mem=4G
 #SBATCH --ntasks-per-node=2
 

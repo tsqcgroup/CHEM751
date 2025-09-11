@@ -1,3 +1,5 @@
+! copy from $DATA to $END and update your input.
+! don't forget to remove COORD=ZMT in your input.
  $DATA
 naphthanelen
 DNH 2

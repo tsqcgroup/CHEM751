@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=Orca
-#SBATCH --partition=shared,kill-shared,exclusive,kill-exclusive
+#SBATCH --partition=chem751 --account=chem751
 #SBATCH --time=00:10:00 ## time format is DD-HH:MM:SS
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=24
-#SBATCH --mem=30G
+#SBATCH --ntasks-per-node=2
+#SBATCH --mem=5G
 
 ulimit -s unlimited
 
@@ -29,7 +29,6 @@ file=$1
 echo $file
 name=${file%.inp}
 INPUT=${name}.inp
-xyz=$name.xyz
 fpath=`realpath $file`
 OUTPUT=${fpath%.inp}.log
 #name=${inp%.inp}
@@ -37,7 +36,6 @@ OUTPUT=${fpath%.inp}.log
 
 # Get things read in the scratch directory
 cp $fpath $SCRdir
-cp $xyz $SCRdir
 cd $SCRdir
 
 echo "Start: "$(date)
@@ -49,9 +47,9 @@ $ORCAexe ${INPUT} > $OUTPUT
 #cp $SCRdir/${name}.bibtex        $work 
 #cp $SCRdir/${name}.densities     $work 
 #cp $SCRdir/${name}.gbw           $work 
-#cp $SCRdir/${name}.xyz           $work 
+cp $SCRdir/${name}.xyz           $work 
 #cp $SCRdir/${name}.property.txt  $work 
-cp $SCRdir/${name}.*             $work 
+
 
 #cp $SCRdir/${name}.densities       $work 
 #cp $SCRdir/${name}.densitiesinfo   $work 

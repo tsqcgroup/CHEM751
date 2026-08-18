@@ -46,6 +46,7 @@ You can copy the submission script from ```script_submit``` directory to your wo
  Otherwise, open the log file and see if it provides you any information to fix 
  your input and resubmit
 
+## More for hands-on and tutorial --> [click](https://docs.google.com/document/d/1KuDKQOQ7g8HRYvJf0_pfKXhNSpQ731QI3fwq2B_z5rs/edit?usp=sharing)
 ## NOTE
 
  **NOTE: GAMESS was originally written in Fortran 77. And many parts of the codes,

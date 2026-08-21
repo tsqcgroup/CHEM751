@@ -62,7 +62,6 @@ fi
 DAT=$SCR/${JOB}.dat
 if [ -e "$DAT" ]; then
   cp $SCR/${JOB}.dat ${name}.dat
-  cp $SCR/${JOB}.* $currentdir
 fi
 
   rm -r $SCR

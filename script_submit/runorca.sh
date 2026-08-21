@@ -12,18 +12,22 @@ ulimit -s unlimited
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 module purge
-module load mpi/OpenMPI/4.1.6-GCC-13.2.0 
+module load tools/tcsh
+module load tools/git
+module load compiler/GCCcore/14.3.0
+module load mpi/OpenMPI/5.0.8-GCC-14.3.0
+module load devel/CMake/4.0.3-GCCcore-14.3.0
+module load lang/Python/3.13.5-GCCcore-14.3.0
 
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-ORCAdir=/mnt/lustre/koa/class/chem751_class/installed_software/orca
-MPIdir="/opt/apps/software/mpi/OpenMPI/4.1.6-GCC-13.2.0/bin"
+ORCAdir=/mnt/lustre/koa/class/chem751_class/installed_software/orca_6.1.1
+MPIdir="/opt/apps/software/mpi/OpenMPI/5.0.8-GCC-14.3.0/bin"
 export PATH="$ORCAdir:$MPIdir:$PATH"
 export LD_LIBRARY_PATH="$ORCAdir:$MPIdir:$LD_LIBRARY_PATH"
 work=`pwd`
 ORCAexe=$ORCAdir/orca
 SCRdir=/mnt/lustre/koa/scratch/$USER/$SLURM_JOB_ID
-mkdir $SCRdir
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 file=$1
 echo $file
@@ -33,6 +37,7 @@ fpath=`realpath $file`
 OUTPUT=${fpath%.inp}.log
 #name=${inp%.inp}
 
+mkdir $SCRdir
 
 # Get things read in the scratch directory
 cp $fpath $SCRdir
@@ -43,23 +48,7 @@ echo $SLURMD_NODENAME
 # Submit the job!
 $ORCAexe ${INPUT} > $OUTPUT
 
-#cp $SCRdir/${name}.densitiesinfo $work 
-#cp $SCRdir/${name}.bibtex        $work 
-#cp $SCRdir/${name}.densities     $work 
-#cp $SCRdir/${name}.gbw           $work 
 cp $SCRdir/${name}.xyz           $work 
-#cp $SCRdir/${name}.property.txt  $work 
-
-
-#cp $SCRdir/${name}.densities       $work 
-#cp $SCRdir/${name}.densitiesinfo   $work 
-#cp $SCRdir/${name}.gbw             $work 
-#cp $SCRdir/${name}.hostnames       $work 
-#cp $SCRdir/${name}.inp             $work 
-#cp $SCRdir/${name}.log             $work 
-#cp $SCRdir/${name}.opt             $work 
-#cp $SCRdir/${name}.property.txt    $work 
-#cp $SCRdir/${name}.xyz             $work 
 
 
 cd $work

@@ -1,7 +1,10 @@
-! copy from $DATA to $END and update your input.
-! don't forget to remove COORD=ZMT in your input.
+ $CONTRL SCFTYP=RHF RUNTYP=ENERGY MAXIT=100 MULT=1 $END
+ $SYSTEM mwords=100 $END
+! modify basis set to use 6-31G(d,p)
+ $BASIS GBASIS=XXX $END
+ $SCF DIRSCF=.TRUE. $END
  $DATA
-naphthanelen
+naphthalene
 DNH 2
 
 C     6.0    -2.43414    -0.69591     0.00000

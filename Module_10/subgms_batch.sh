@@ -1,7 +1,8 @@
 #!/bin/bash
 #------------------------------------------------------------------------------
-# To submit a GAMESS job:   sbatch subgms_batch.sh my_molecule.inp
-# Output: my_molecule.log (+ .dat/.efp if produced). Check jobs: squeue -u $USER
+# Runs ALL *.inp in the directory you submit from, one after another, as a
+# single Slurm job:   cd UHF; sbatch ../subgms_batch.sh
+# Output: one .log per .inp (+ .dat/.efp if produced). Check jobs: squeue -u $USER
 #------------------------------------------------------------------------------
 # STEP1: Slurm resources: nodes, time limit, class queue, memory, MPI processes/node
 #------------------------------------------------------------------------------
@@ -32,61 +33,71 @@ PPN2=$((SLURM_NTASKS/SLURM_NNODES))   # processes per node
 NCPUS2=$((SLURM_NNODES*PPN2))         # total processes
 
 #------------------------------------------------------------------------------
-# STEP4: GAMESS install path, scratch folder (one per job), and GAMESS file setup
+# STEP4: GAMESS install path and scratch folder (one per Slurm job)
 #------------------------------------------------------------------------------
 GMSPATH=/mnt/lustre/koa/class/chem751_class/installed_software/gms_mpi_noDS
 
  srun $GMSPATH/bin/my_ipcrm           # clear leftover shared memory
 export SCR=/mnt/lustre/koa/scratch/$USER/$SLURM_JOBID
 export USERSCR=${SCR}
-export JOB=JOB.${SLURM_JOBID}
-source $GMSPATH/gms-files.bash
-export INPUT=$USERSCR/${JOB}.F05
-export OUTPUT=$USERSCR/${JOB}.F06
-
-#------------------------------------------------------------------------------
-# STEP5: File names: $1 is the .inp given to sbatch; log goes next to it
-# *** TODO: we can change to use for-loop to submit all .inp in the directory ***
-# *** Use with caution!!! as it could overwrite your finished log files       ***
-#------------------------------------------------------------------------------
-file=$1
-echo $file
-inp=`realpath $file`
-output=${inp%.inp}.log
-name=${inp%.inp}
-
-#------------------------------------------------------------------------------
-# STEP6: Copy input to scratch and run GAMESS there
-#------------------------------------------------------------------------------
 mkdir -p $SCR
 export currentdir=`pwd`
-cp $inp $INPUT
-cd $SCR
-echo "srun --mpi=pmix -N $NNODES -n $NCPUS2 --ntasks-per-node=$PPN2 --export=ALL --cpu-bind verbose,cores \
-  $GMSPATH/gamess.00.x >& $output"
-
-srun --mpi=pmix -N $NNODES -n $NCPUS2 --ntasks-per-node=$PPN2 --export=ALL --cpu-bind verbose,cores \
-  $GMSPATH/gamess.00.x >& $output
-
-cd $currentdir
 
 #------------------------------------------------------------------------------
-# STEP7: Copy back result files if they exist
+# STEP5: Loop over every .inp in the submit directory -> ONE Slurm job
+# *** Use with caution!!! Inputs whose .log already finished normally are ***
+# *** skipped; any other existing .log will be overwritten.               ***
 #------------------------------------------------------------------------------
-# copy efp file
-EFP=$SCR/${JOB}.efp
-if [ -e "$EFP" ]; then
-  cp $SCR/${JOB}.efp ${name}.efp
-fi
+for file in *.inp; do
+  inp=`realpath $file`
+  output=${inp%.inp}.log
+  name=${inp%.inp}
 
-# copy dat file
-DAT=$SCR/${JOB}.dat
-if [ -e "$DAT" ]; then
-  cp $SCR/${JOB}.dat ${name}.dat
-fi
+  if [ -e "$output" ] && grep -q "EXECUTION OF GAMESS TERMINATED NORMALLY" $output; then
+    echo "Skipping $file (finished log exists)"
+    continue
+  fi
+  echo "Running $file"
 
-#------------------------------------------------------------------------------
-# STEP8: Clean up scratch
-#------------------------------------------------------------------------------
-  rm -r $SCR
- srun $GMSPATH/bin/my_ipcrm
+  # GAMESS file setup (unique JOB name per input so files do not collide)
+  base=`basename ${inp%.inp}`
+  export JOB=JOB.${SLURM_JOBID}.${base}
+  source $GMSPATH/gms-files.bash
+  export INPUT=$USERSCR/${JOB}.F05
+  export OUTPUT=$USERSCR/${JOB}.F06
+
+  #----------------------------------------------------------------------------
+  # STEP6: Copy input to scratch and run GAMESS there
+  #----------------------------------------------------------------------------
+  cp $inp $INPUT
+  cd $SCR
+  echo "srun --mpi=pmix -N $NNODES -n $NCPUS2 --ntasks-per-node=$PPN2 --export=ALL --cpu-bind verbose,cores \
+    $GMSPATH/gamess.00.x >& $output"
+
+  srun --mpi=pmix -N $NNODES -n $NCPUS2 --ntasks-per-node=$PPN2 --export=ALL --cpu-bind verbose,cores \
+    $GMSPATH/gamess.00.x >& $output
+
+  cd $currentdir
+
+  #----------------------------------------------------------------------------
+  # STEP7: Copy back result files if they exist, then clear this job's scratch
+  #----------------------------------------------------------------------------
+  # copy efp file
+  EFP=$SCR/${JOB}.efp
+  if [ -e "$EFP" ]; then
+    cp $EFP ${name}.efp
+  fi
+
+  # copy dat file
+  DAT=$SCR/${JOB}.dat
+  if [ -e "$DAT" ]; then
+    cp $DAT ${name}.dat
+  fi
+
+ #------------------------------------------------------------------------------
+ # STEP8: Clean up scratch
+ #------------------------------------------------------------------------------
+  rm -f $SCR/${JOB}.*
+  srun $GMSPATH/bin/my_ipcrm
+done
+

@@ -15,7 +15,7 @@ Helpful [GAMESS manual](https://github.com/tsqcgroup/CHEM751/blob/main/gamess_ma
 | File | What it does |
 |------|--------------|
 | `make_H2input.sh` | Writes a template input and makes one GAMESS input per H-H distance in a folder named after the method (`UHF/` or `RHF/`). |
-| `subgms_batch.sh` | Slurm script to submit a GAMESS job: `sbatch subgms_batch.sh my_molecule.inp` |
+| `subgms_batch.sh` | Slurm script that runs every `*.inp` in the submit directory, one after another, in a single job: `sbatch subgms_batch.sh` |
 | `extract_E_S2.sh` | Collects the final energy (and <S^2>) from each log file into `H2_<method>.csv`. |
 
 Each script has `TODO` lines for you to complete.
@@ -25,12 +25,13 @@ Each script has `TODO` lines for you to complete.
    ```
    bash make_H2input.sh
    ```
-2. Submit all inputs in the folder, for example:
+2. Submit all inputs in the folder as **one** Slurm job (the script loops over every `*.inp` in the directory you submit from), for example:
    ```
    cd UHF
-   for f in *.inp; do sbatch ../subgms_batch.sh $f; done
+   sbatch ../subgms_batch.sh
    squeue -u $USER
    ```
+   Each `X.inp` produces `X.log` in the same folder. Inputs that already have a log ending with `EXECUTION OF GAMESS TERMINATED NORMALLY` are skipped, so you can resubmit to rerun only failed/unfinished ones. If you have many inputs, increase the `#SBATCH -t` time limit.
 3. When the jobs finish, extract the data (run inside the folder with the log files):
    ```
    bash ../extract_E_S2.sh
